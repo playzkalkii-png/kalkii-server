@@ -5,6 +5,7 @@ const players = {};
 
 wss.on('connection', ws => {
   const id = nextId++;
+  console.log('Player connected:', id);
   players[id] = { x: 0, z: 0, a: 0 };
   ws.send(JSON.stringify({ type: 'init', id }));
 
@@ -17,7 +18,11 @@ wss.on('connection', ws => {
     } catch (e) {}
   });
 
-  ws.on('close', () => { delete players[id]; });
+  ws.on('close', (code) => {
+    console.log('Player left:', id, 'code:', code);
+    delete players[id];
+  });
+  ws.on('error', (e) => console.log('Socket error:', e.message));
 });
 
 setInterval(() => {
